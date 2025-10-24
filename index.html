@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love & Death</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Use Times New Roman as the primary, non-italic serif font */
+        body {
+            font-family: "Times New Roman", Times, serif;
+
+            /* Set the background to use CSS variables.
+              The browser will now transition the *variables*, not the whole gradient string.
+            */
+            background: linear-gradient(to right, var(--love-bg) 40%, var(--death-bg) 60%);
+            
+            /* Tell the browser to transition these specific properties over 7 seconds.
+            */
+            transition: --love-bg 7s ease-in-out, --death-bg 7s ease-in-out;
+        }
+
+        /* Style for the quote containers, transitions the text color */
+        .quote-panel {
+            color: var(--love-text); /* Love panel will use love-text */
+            transition: color 7s ease-in-out;
+        }
+        
+        #death-panel {
+            color: var(--death-text); /* Death panel overrides to use death-text */
+        }
+
+        /* Fade-in/out animation for the text change */
+        .quote-text {
+            transition: opacity 2s ease-in-out;
+        }
+
+        .quote-text.fade-out {
+            opacity: 0;
+        }
+    </style>
+</head>
+<body class="overflow-hidden">
+
+    <!-- Main container for the two panels -->
+    <div class="flex w-screen h-screen">
+        
+        <!-- Left Panel: Love -->
+        <div id="love-panel" class="quote-panel w-1/2 h-full flex items-center justify-center p-12">
+            <p id="love-quote" class="quote-text font-normal leading-relaxed text-center">Loading...</p>
+        </div>
+        
+        <!-- Right Panel: Death -->
+        <div id="death-panel" class="quote-panel w-1/2 h-full flex items-center justify-center p-12">
+            <p id="death-quote" class="quote-text font-normal leading-relaxed text-center">Loading...</p>
+        </div>
+
+    </div>
+
+    <script>
+        // --- 1. SET YOUR GITHUB PAGES URLS HERE ---
+        // Example: 'https://your-username.github.io/quote-site/love_quotes.txt'
+        const LOVE_QUOTES_URL = 'PASTE_YOUR_LOVE_QUOTES_URL_HERE';
+        const DEATH_QUOTES_URL = 'PASTE_YOUR_DEATH_QUOTES_URL_HERE';
+
+        // --- REGISTER CSS PROPERTIES ---
+        // This tells the browser *how* to animate our custom properties (as colors)
+        try {
+            CSS.registerProperty({
+              name: '--love-bg',
+              syntax: '<color>',
+              inherits: false,
+              initialValue: '#FEF2F2',
+            });
+            CSS.registerProperty({
+              name: '--death-bg',
+              syntax: '<color>',
+              inherits: false,
+              initialValue: '#F9FAFB',
+            });
+        } catch (e) {
+            console.warn("CSS.registerProperty is not supported in this browser, but we'll try anyway.");
+        }
+
+        // --- GLOBAL ARRAYS ---
+        let loveQuotes = [];
+        let deathQuotes = [];
+        let loveQuoteBag = []; // For non-repeating randoms
+        let deathQuoteBag = []; // For non-repeating randoms
+
+        // --- GET ELEMENTS ---
+        const lovePanel = document.getElementById('love-panel');
+        const deathPanel = document.getElementById('death-panel');
+        const loveQuoteEl = document.getElementById('love-quote');
+        const deathQuoteEl = document.getElementById('death-quote');
+        const body = document.body;
+
+        // --- SEQUENTIAL COLOR PALETTES (Light -> Medium -> Dark -> Medium -> Light) ---
+        const lovePalette = [
+            ['#FEF2F2', '#9F1239'], // 1. Lightest (Pink/Red)
+            ['#FBCFE8', '#831843'], // 2. Medium (Pink/Magenta)
+            ['#831843', '#FEF2F2'], // 3. Darkest (Magenta/Pink)
+            ['#FBCFE8', '#831843']  // 4. Medium (back to medium)
+        ];
+
+        const deathPalette = [
+            ['#F9FAFB', '#111827'], // 1. Lightest (White/Black)
+            ['#D1D5DB', '#1F2937'], // 2. Medium (Gray/Dark Gray)
+            ['#1F2937', '#F9FAFB'], // 3. Darkest (Dark Gray/White)
+            ['#D1D5DB', '#1F2937']  // 4. Medium (back to medium)
+        ];
+        
+        let loveColorIndex = 0;
+        let deathColorIndex = 0;
+
+        // --- FONT SIZE CLASSES ---
+        const baseFontClasses = ['text-2xl', 'md:text-4xl'];
+        const mediumFontClasses = ['text-xl', 'md:text-3xl'];
+        const smallFontClasses = ['text-lg', 'md:text-2xl'];
+
+        // --- FUNCTIONS ---
+
+        // Parses the raw text from the .txt file using '[]'
+        function parseQuotes(rawText) {
+            return rawText.split('[]')
+                          .map(q => q.trim())
+                          .filter(q => q.length > 0);
+        }
+
+        // Adjusts font size based on quote length
+        function adjustFontSize(element, text) {
+            element.classList.remove(...baseFontClasses, ...mediumFontClasses, ...smallFontClasses);
+            if (text.length > 150) {
+                element.classList.add(...smallFontClasses);
+            } else if (text.length > 100) {
+                element.classList.add(...mediumFontClasses);
+            } else {
+                element.classList.add(...baseFontClasses);
+            }
+        }
+
+        // Updates colors by setting CSS variables
+        function updateColors() {
+            const [loveBg, loveText] = lovePalette[loveColorIndex % lovePalette.length];
+            const [deathBg, deathText] = deathPalette[deathColorIndex % deathPalette.length];
+            
+            // Set text colors
+            lovePanel.style.color = loveText;
+            deathPanel.style.color = deathText;
+            
+            // Set the CSS variables. The browser will smoothly transition them.
+            body.style.setProperty('--love-bg', loveBg);
+            body.style.setProperty('--death-bg', deathBg);
+        }
+
+        // --- RANDOMIZATION LOGIC ---
+
+        // Fisher-Yates shuffle algorithm
+        function shuffle(array) {
+            let currentIndex = array.length,  randomIndex;
+            while (currentIndex != 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [
+                    array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        // Draws a random quote from the "love bag", refills and shuffles if empty
+        function drawLoveQuote() {
+            if (loveQuoteBag.length === 0) {
+                loveQuoteBag = [...loveQuotes]; // Refill the bag
+                shuffle(loveQuoteBag);          // Shuffle it
+            }
+            return loveQuoteBag.pop(); // Draw one
+        }
+
+        // Draws a random quote from the "death bag"
+        function drawDeathQuote() {
+            if (deathQuoteBag.length === 0) {
+                deathQuoteBag = [...deathQuotes]; // Refill the bag
+                shuffle(deathQuoteBag);           // Shuffle it
+            }
+            return deathQuoteBag.pop(); // Draw one
+        }
+
+        // Updates quote element with a fade effect
+        function updateQuote(element, quoteDrawerFunction) {
+            element.classList.add('fade-out'); // Start fade out
+            const newQuote = quoteDrawerFunction(); // Get a new random quote
+            
+            setTimeout(() => {
+                adjustFontSize(element, newQuote);
+                element.textContent = newQuote;
+                element.classList.remove('fade-out'); // Start fade in
+            }, 2000); // This MUST match the CSS transition duration
+        }
+
+        // --- APP STARTUP LOGIC ---
+        async function startApp() {
+            // Set initial colors as variables *before* anything renders
+            const [loveBg, loveText] = lovePalette[loveColorIndex];
+            const [deathBg, deathText] = deathPalette[deathColorIndex];
+            body.style.setProperty('--love-bg', loveBg);
+            body.style.setProperty('--love-text', loveText);
+            body.style.setProperty('--death-bg', deathBg);
+            body.style.setProperty('--death-text', deathText);
+
+            try {
+                // 1. Fetch both files at the same time
+                const [loveResponse, deathResponse] = await Promise.all([
+                    fetch(LOVE_QUOTES_URL),
+                    fetch(DEATH_QUOTES_URL)
+                ]);
+
+                // Check for HTTP errors
+                if (!loveResponse.ok || !deathResponse.ok) {
+                    throw new Error(`Failed to fetch: ${loveResponse.statusText} & ${deathResponse.statusText}. Check your URLs.`);
+                }
+
+                // 2. Get text and parse it
+                const loveText = await loveResponse.text();
+                const deathText = await deathResponse.text();
+                
+                loveQuotes = parseQuotes(loveText);
+                deathQuotes = parseQuotes(deathText);
+
+                // Check if parsing worked
+                if (loveQuotes.length === 0 || deathQuotes.length === 0) {
+                    throw new Error('Parsing failed or files are empty. Check file format for "[]".');
+                }
+
+                // 3. Initialize the app (set first quotes)
+                const initialLoveQuote = drawLoveQuote();
+                const initialDeathQuote = drawDeathQuote();
+                
+                adjustFontSize(loveQuoteEl, initialLoveQuote);
+                adjustFontSize(deathQuoteEl, initialDeathQuote);
+                
+                loveQuoteEl.textContent = initialLoveQuote;
+                deathQuoteEl.textContent = initialDeathQuote;
+                
+                // 4. Start all intervals *after* everything is loaded
+                setInterval(() => {
+                    updateQuote(loveQuoteEl, drawLoveQuote);
+                }, 11000); 
+
+                setInterval(() => {
+                    updateQuote(deathQuoteEl, drawDeathQuote);
+                }, 23000); 
+
+                setInterval(() => {
+                    loveColorIndex++;
+                    updateColors();
+                }, 25000); 
+
+                setInterval(() => {
+                    deathColorIndex++;
+                    updateColors();
+                }, 31000); 
+
+            } catch (error) {
+                console.error('Failed to start app:', error);
+                loveQuoteEl.textContent = `Error loading quotes. ${error.message}`;
+                deathQuoteEl.textContent = `Error loading quotes. ${error.message}`;
+            }
+        }
+
+        // Run the app
+        startApp();
+
+    </script>
+</body>
+</html>
