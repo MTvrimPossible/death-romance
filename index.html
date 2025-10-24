@@ -11,14 +11,19 @@
         body {
             font-family: "Times New Roman", Times, serif;
 
-            /* Set the background to use CSS variables.
-              The browser will now transition the *variables*, not the whole gradient string.
-            */
-            background: linear-gradient(to right, var(--love-bg) 40%, var(--death-bg) 60%);
+            /* MOBILE-FIRST GRADIENT: (to bottom) */
+            background: linear-gradient(to bottom, var(--love-bg) 40%, var(--death-bg) 60%);
             
             /* Tell the browser to transition these specific properties over 7 seconds.
             */
             transition: --love-bg 7s ease-in-out, --death-bg 7s ease-in-out;
+        }
+
+        /* DESKTOP GRADIENT: (md breakpoint is 768px) */
+        @media (min-width: 768px) {
+            body {
+                background: linear-gradient(to right, var(--love-bg) 40%, var(--death-bg) 60%);
+            }
         }
 
         /* Style for the quote containers, transitions the text color */
@@ -43,16 +48,22 @@
 </head>
 <body class="overflow-hidden">
 
-    <!-- Main container for the two panels -->
-    <div class="flex w-screen h-screen">
+    <!-- Main container for the two panels
+         flex-col (mobile) -> md:flex-row (desktop)
+    -->
+    <div class="flex flex-col md:flex-row w-screen h-screen">
         
-        <!-- Left Panel: Love -->
-        <div id="love-panel" class="quote-panel w-1/2 h-full flex items-center justify-center p-12">
+        <!-- Left Panel: Love
+             w-full h-1/2 (mobile) -> md:w-1/2 md:h-full (desktop)
+        -->
+        <div id="love-panel" class="quote-panel w-full h-1/2 md:w-1/2 md:h-full flex items-center justify-center p-12">
             <p id="love-quote" class="quote-text font-normal leading-relaxed text-center">Loading...</p>
         </div>
         
-        <!-- Right Panel: Death -->
-        <div id="death-panel" class="quote-panel w-1/2 h-full flex items-center justify-center p-12">
+        <!-- Right Panel: Death
+             w-full h-1/2 (mobile) -> md:w-1/2 md:h-full (desktop)
+        -->
+        <div id="death-panel" class="quote-panel w-full h-1/2 md:w-1/2 md:h-full flex items-center justify-center p-12">
             <p id="death-quote" class="quote-text font-normal leading-relaxed text-center">Loading...</p>
         </div>
 
@@ -282,4 +293,3 @@
     </script>
 </body>
 </html>
-
