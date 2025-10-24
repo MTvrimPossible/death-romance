@@ -60,7 +60,7 @@
 
     <script>
         // --- 1. SET YOUR GITHUB PAGES URLS HERE ---
-        // Example: 'https://your-username.github.io/quote-site/love_quotes.txt'
+        // URLs have been updated as requested
         const LOVE_QUOTES_URL = 'https://MTvrimPossible.github.io/death-romance/love_quotes.txt';
         const DEATH_QUOTES_URL = 'https://MTvrimPossible.github.io/death-romance/death_quotes.txt';
 
@@ -122,18 +122,23 @@
         // --- FUNCTIONS ---
 
         // Parses the raw text from the .txt file using '[]'
+        // NEW: Also replaces newline characters (\n) with <br> tags
         function parseQuotes(rawText) {
             return rawText.split('[]')
                           .map(q => q.trim())
+                          .map(q => q.replace(/\n/g, '<br>')) // Replaces newlines with <br>
                           .filter(q => q.length > 0);
         }
 
         // Adjusts font size based on quote length
         function adjustFontSize(element, text) {
+            // Check length against the *text* content, not the HTML
+            const textLength = text.replace(/<br>/g, ' ').length; 
             element.classList.remove(...baseFontClasses, ...mediumFontClasses, ...smallFontClasses);
-            if (text.length > 150) {
+            
+            if (textLength > 150) {
                 element.classList.add(...smallFontClasses);
-            } else if (text.length > 100) {
+            } else if (textLength > 100) {
                 element.classList.add(...mediumFontClasses);
             } else {
                 element.classList.add(...baseFontClasses);
@@ -193,7 +198,8 @@
             
             setTimeout(() => {
                 adjustFontSize(element, newQuote);
-                element.textContent = newQuote;
+                // NEW: Use .innerHTML to render <br> tags
+                element.innerHTML = newQuote;
                 element.classList.remove('fade-out'); // Start fade in
             }, 2000); // This MUST match the CSS transition duration
         }
@@ -239,8 +245,9 @@
                 adjustFontSize(loveQuoteEl, initialLoveQuote);
                 adjustFontSize(deathQuoteEl, initialDeathQuote);
                 
-                loveQuoteEl.textContent = initialLoveQuote;
-                deathQuoteEl.textContent = initialDeathQuote;
+                // NEW: Use .innerHTML to render <br> tags
+                loveQuoteEl.innerHTML = initialLoveQuote;
+                deathQuoteEl.innerHTML = initialDeathQuote;
                 
                 // 4. Start all intervals *after* everything is loaded
                 setInterval(() => {
@@ -263,8 +270,9 @@
 
             } catch (error) {
                 console.error('Failed to start app:', error);
-                loveQuoteEl.textContent = `Error loading quotes. ${error.message}`;
-                deathQuoteEl.textContent = `Error loading quotes. ${error.message}`;
+                // NEW: Use .innerHTML to render error
+                loveQuoteEl.innerHTML = `Error loading quotes. ${error.message}`;
+                deathQuoteEl.innerHTML = `Error loading quotes. ${error.message}`;
             }
         }
 
@@ -273,5 +281,5 @@
 
     </script>
 </body>
-
 </html>
+
