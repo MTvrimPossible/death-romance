@@ -2213,11 +2213,6 @@ It will be known I died a constant lover!
 
 []
 
-O gentle death, when wilt thou come?
-For of my life I am wearie.
-
-[]
-
 Since Destiny doth soe Ordaine
 thy love shall not my life susteine
 Death is lesse Dismall then Disdaine.
@@ -6931,4 +6926,5 @@ When woman bared her soul to man.
 
 If this be error, and upon me prov'd,
 I never writ, nor no man ever lov'd.
+
 
