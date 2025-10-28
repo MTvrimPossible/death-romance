@@ -630,7 +630,7 @@ The duration of passion is proportionate with the original resistance of the wom
 
 []
 
-You can't expect me to keep up that level of charm—I'd have a heart attack!"
+You can't expect me to keep up that level of charm—I'd have a heart attack!
 
 []
 
@@ -6942,6 +6942,7 @@ When woman bared her soul to man.
 
 If this be error, and upon me prov'd,
 I never writ, nor no man ever lov'd.
+
 
 
 
