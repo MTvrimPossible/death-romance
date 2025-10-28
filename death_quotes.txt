@@ -14,7 +14,7 @@ Hail to me! You are coming – I hear you!
 
 []
 
-This life as you now live it and have lived it you will have to live once again and innumerable times again; and there will be nothing new in it, but every pain and every joy and every thought and sigh and everything unspeakably small or great in your life must return to you, all in the same succession and sequence - even this spider and this moonlight between the trees, and even this moment and I myself. The eternal hourglass of existence is turned over again and again, and you with it, speck of dust!
+This life as you now live it and have lived it you will have to live once again and innumerable times again; and there will be nothing new in it, but every pain and every joy and every thought and sigh and everything unspeakably small or great in your life must return to you, all in the same succession and sequence - even this spider and this moonlight between the trees, and even this moment and I myself. The eternal hourglass of existencfe is turned over again and again, and you with it, speck of dust!
 
 []
 
@@ -392,10 +392,6 @@ Clov: Do you believe in the life to come? Hamm: Mine was always that.
 []
 
 Oh Gilgamec! Enlil, the Great Mountain, the father of gods, has made kingship your destiny, but not eternal life.
-
-[]
-
-I don't want to achieve immortality through my work; I want to achieve immortality through not dying. I don't want to live on in the hearts of my countrymen; I want to live on in my apartment.
 
 []
 
@@ -3268,4 +3264,5 @@ Death gives meaning to life. Living in fear of death is living in denial. Actual
 Death is nothing but death, but it prevents life. If you are afraid, life has no value, and if you die, everything dies.
 
 []
+
 
